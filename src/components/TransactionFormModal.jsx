@@ -21,12 +21,15 @@ const TransactionFormModal = ({ userId, show, onClose, onTransactionAdded, editD
   const fetchCategories = async (type) => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories?type=${type}`);
-      const unique = res.data.filter((cat, idx, self) =>
+      // Đảm bảo res.data là mảng
+      const data = Array.isArray(res.data) ? res.data : [];
+      const unique = data.filter((cat, idx, self) =>
         idx === self.findIndex(c => c.categoryName === cat.categoryName && c.type === cat.type)
       );
       setCategories(unique);
     } catch (err) {
       console.error("Lỗi lấy danh mục", err);
+      setCategories([]);
     }
   };
 
@@ -77,7 +80,7 @@ const TransactionFormModal = ({ userId, show, onClose, onTransactionAdded, editD
         res = await axios.put(`${import.meta.env.VITE_API_URL}/api/transactions/${formData.transactionId}?userId=${userId}`, payload);
         toast.showToast('success', 'Sửa giao dịch thành công', res.data.budgetMessage || '');
       } else {
-        res = await axios.post('${import.meta.env.VITE_API_URL}/api/transactions', payload);
+        res = await axios.post(`${import.meta.env.VITE_API_URL}/api/transactions`, payload);
         toast.showToast('success', 'Thêm giao dịch thành công', res.data.budgetMessage || '');
       }
       onTransactionAdded();
@@ -90,14 +93,14 @@ const TransactionFormModal = ({ userId, show, onClose, onTransactionAdded, editD
   const handleCreateCategory = async (e) => {
     e.preventDefault();
     try {
-      const catRes = await axios.post('${import.meta.env.VITE_API_URL}/api/categories', {
+      const catRes = await axios.post(`${import.meta.env.VITE_API_URL}/api/categories`, {
         categoryName: newCatName,
         type: newCatType
       });
       const newCategory = catRes.data;
       if (newCatType === 'CHI' && newCatLimit) {
         const currentMonth = new Date().toISOString().slice(0, 7);
-        await axios.post('${import.meta.env.VITE_API_URL}/api/budgets/set-limit', {
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/budgets/set-limit`, {
           user: { userId },
           category: { categoryId: newCategory.categoryId },
           month: currentMonth,

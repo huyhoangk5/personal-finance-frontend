@@ -30,9 +30,17 @@ const EditProfileModal = ({ show, onClose, user, onUpdate }) => {
         onClose();
       }
     } catch (err) {
-      const msg = err.response?.data?.message || 'Cập nhật thất bại';
-      setError(msg);
-      toast.showToast('error', 'Cập nhật thất bại', msg);
+      // Xử lý lỗi duplicate email (status 400)
+      let errorMsg = 'Cập nhật thất bại';
+      if (err.response?.status === 400) {
+        errorMsg = 'Email đã tồn tại. Vui lòng sử dụng email khác.';
+      } else if (err.response?.data?.message) {
+        errorMsg = err.response.data.message;
+      } else if (err.response?.data) {
+        errorMsg = err.response.data;
+      }
+      setError(errorMsg);
+      toast.showToast('error', 'Cập nhật thất bại', errorMsg);
     } finally {
       setLoading(false);
     }
