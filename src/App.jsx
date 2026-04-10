@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import QrConfirm from './pages/QrConfirm';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -26,17 +27,19 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AuthProvider>
-      <ThemeProvider>
-        <LanguageProvider>
-          <ToastProvider>
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
-          </ToastProvider>
-        </LanguageProvider>
-      </ThemeProvider>
-    </AuthProvider>
+    <GoogleOAuthProvider clientId="923508787768-tirtvocpu20jrba6khna61ppbqjv3idj.apps.googleusercontent.com">
+      <AuthProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <ToastProvider>
+              <BrowserRouter>
+                <AppRoutes />
+              </BrowserRouter>
+            </ToastProvider>
+          </LanguageProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
 

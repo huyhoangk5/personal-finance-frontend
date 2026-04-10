@@ -193,7 +193,6 @@ const Login = () => {
                                   theme="outline"
                                   size="large"
                                   text="continue_with"
-                                  width="100%"
                                 />
                               </div>
                               <button
