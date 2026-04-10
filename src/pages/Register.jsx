@@ -29,7 +29,7 @@ const Register = () => {
     const fetchQrToken = async () => {
       setQrLoading(true);
       try {
-        const res = await axios.get('${import.meta.env.VITE_API_URL}/api/users/qr-login/generate');
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/qr-login/generate`);
         setQrToken(res.data);
       } catch (err) {
         console.error("Lỗi lấy QR token:", err);
@@ -42,7 +42,7 @@ const Register = () => {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const res = await axios.post('${import.meta.env.VITE_API_URL}/api/users/google-login', { token: credentialResponse.credential });
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/users/google-login`, { token: credentialResponse.credential });
       login(res.data);
       navigate('/');
     } catch (err) {
@@ -76,7 +76,7 @@ const Register = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post('${import.meta.env.VITE_API_URL}/api/users/register', { username, password });
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/users/register`, { username, password });
       setSuccess(res.data);
       toast.showToast('success', 'Đăng ký thành công', res.data);
       setTimeout(() => navigate('/login'), 2000);
