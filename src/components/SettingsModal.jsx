@@ -35,7 +35,7 @@ const SettingsModal = ({ show, onClose }) => {
     }
     setLoading(true);
     try {
-      await axios.put('${import.meta.env.VITE_API_URL}/api/users/change-password', {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/users/change-password`, {
         userId: user.userId,
         oldPassword,
         newPassword

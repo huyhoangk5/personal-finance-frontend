@@ -22,7 +22,7 @@ const QrConfirm = () => {
     }
     const confirm = async () => {
       try {
-        await axios.post('${import.meta.env.VITE_API_URL}/api/users/qr-login/confirm', {
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/users/qr-login/confirm`, {
           qrToken,
           userId: user.userId
         });

@@ -46,7 +46,7 @@ const CategoryBudgetManager = ({ userId, onDataChange }) => {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const res = await axios.get('${import.meta.env.VITE_API_URL}/api/categories');
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories`);
       const unique = res.data.filter((cat, idx, self) =>
         idx === self.findIndex(c => c.categoryName === cat.categoryName && c.type === cat.type)
       );
@@ -90,14 +90,14 @@ const CategoryBudgetManager = ({ userId, onDataChange }) => {
   const handleCreateCategory = async (e) => {
     e.preventDefault();
     try {
-      const catRes = await axios.post('${import.meta.env.VITE_API_URL}/api/categories', {
+      const catRes = await axios.post(`${import.meta.env.VITE_API_URL}/api/categories`, {
         categoryName: newName,
         type: newType
       });
       const newCategory = catRes.data;
       if (newType === 'CHI' && newLimit) {
         const currentMonth = new Date().toISOString().slice(0, 7);
-        await axios.post('${import.meta.env.VITE_API_URL}/api/budgets/set-limit', {
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/budgets/set-limit`, {
           user: { userId },
           category: { categoryId: newCategory.categoryId },
           month: currentMonth,
@@ -126,7 +126,7 @@ const CategoryBudgetManager = ({ userId, onDataChange }) => {
       });
       if (editType === 'CHI') {
         const currentMonth = new Date().toISOString().slice(0, 7);
-        await axios.post('${import.meta.env.VITE_API_URL}/api/budgets/set-limit', {
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/budgets/set-limit`, {
           user: { userId },
           category: { categoryId: editingCategory.categoryId },
           month: currentMonth,

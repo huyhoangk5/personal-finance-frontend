@@ -21,7 +21,6 @@ const TransactionFormModal = ({ userId, show, onClose, onTransactionAdded, editD
   const fetchCategories = async (type) => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories?type=${type}`);
-      // Đảm bảo res.data là mảng
       const data = Array.isArray(res.data) ? res.data : [];
       const unique = data.filter((cat, idx, self) =>
         idx === self.findIndex(c => c.categoryName === cat.categoryName && c.type === cat.type)
