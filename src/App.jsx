@@ -10,6 +10,7 @@ import QrConfirm from './pages/QrConfirm';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import QrLoginPage from './pages/QrLoginPage';
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -21,6 +22,7 @@ function AppRoutes() {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/qr-confirm" element={<QrConfirm />} />
       <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+      <Route path="/qr-login" element={<QrLoginPage />} />
     </Routes>
   );
 }
