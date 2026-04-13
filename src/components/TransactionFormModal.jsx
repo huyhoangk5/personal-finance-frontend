@@ -61,10 +61,17 @@ const TransactionFormModal = ({ userId, show, onClose, onTransactionAdded, editD
     if (!value || isNaN(parseFloat(value))) return [];
     const num = parseFloat(value);
     if (num === 0) return [];
-    const multipliers = [1000, 10000, 100000, 1000000];
-    let suggestions = multipliers.map(m => num * m);
-    suggestions = [...new Set(suggestions)].filter(s => s <= 10000000).sort((a, b) => a - b);
-    return suggestions;
+    const base = num;
+    const multipliers = [10, 100, 1000, 10000, 100000, 1000000];
+    const suggestions = [];
+    const maxLimit = 10_000_000_000;
+    for (let mult of multipliers) {
+      const suggested = base * mult;
+      if (suggested <= maxLimit && !suggestions.includes(suggested)) {
+        suggestions.push(suggested);
+      }
+    }
+    return suggestions.sort((a, b) => a - b);
   };
 
   const handleAmountChange = (e) => {
