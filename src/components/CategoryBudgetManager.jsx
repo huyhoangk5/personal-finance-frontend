@@ -20,7 +20,12 @@ const CategoryBudgetManager = ({ userId, onDataChange }) => {
   const [spendingData, setSpendingData] = useState({});
   const [incomeData, setIncomeData] = useState({});
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
-  const [deleteTarget, setDeleteTarget] = useState(null); // { id, name }
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  // state cho gợi ý hạn mức
+  const [showNewLimitSuggestions, setShowNewLimitSuggestions] = useState(false);
+  const [newLimitSuggestions, setNewLimitSuggestions] = useState([]);
+  const [showEditLimitSuggestions, setShowEditLimitSuggestions] = useState(false);
+  const [editLimitSuggestions, setEditLimitSuggestions] = useState([]);
 
   const fetchSpending = useCallback(async () => {
     if (!userId) return;
@@ -85,6 +90,45 @@ const CategoryBudgetManager = ({ userId, onDataChange }) => {
     if (percent > 100) return { text: 'Vượt', class: 'bg-danger' };
     if (percent >= 80) return { text: 'Cảnh báo', class: 'bg-warning text-dark' };
     return null;
+  };
+
+  const generateSuggestions = (value) => {
+    if (!value || isNaN(parseFloat(value))) return [];
+    const num = parseFloat(value);
+    if (num === 0) return [];
+    const firstDigit = parseInt(value.toString()[0]);
+    const suggestions = [];
+    const multipliers = [1000, 10000, 100000, 1000000];
+    for (let mult of multipliers) {
+      suggestions.push(firstDigit * mult);
+    }
+    return [...new Set(suggestions)].sort((a, b) => a - b);
+  };
+
+  const handleNewLimitChange = (e) => {
+    const val = e.target.value;
+    setNewLimit(val);
+    const suggestions = generateSuggestions(val);
+    setNewLimitSuggestions(suggestions);
+    setShowNewLimitSuggestions(suggestions.length > 0);
+  };
+
+  const handleEditLimitChange = (e) => {
+    const val = e.target.value;
+    setEditLimit(val);
+    const suggestions = generateSuggestions(val);
+    setEditLimitSuggestions(suggestions);
+    setShowEditLimitSuggestions(suggestions.length > 0);
+  };
+
+  const selectNewLimitSuggestion = (val) => {
+    setNewLimit(val.toString());
+    setShowNewLimitSuggestions(false);
+  };
+
+  const selectEditLimitSuggestion = (val) => {
+    setEditLimit(val.toString());
+    setShowEditLimitSuggestions(false);
   };
 
   const handleCreateCategory = async (e) => {
@@ -241,7 +285,25 @@ const CategoryBudgetManager = ({ userId, onDataChange }) => {
             {newType === 'CHI' && (
               <div className="col-md-3">
                 <label className="form-label small">Hạn mức (VND)</label>
-                <input type="number" className="form-control" placeholder="VD: 5000000" value={newLimit} onChange={e => setNewLimit(e.target.value)} />
+                <div className="position-relative">
+                  <input
+                    type="number"
+                    className="form-control no-arrows"
+                    placeholder="VD: 5000000"
+                    value={newLimit}
+                    onChange={handleNewLimitChange}
+                    onBlur={() => setTimeout(() => setShowNewLimitSuggestions(false), 200)}
+                  />
+                  {showNewLimitSuggestions && newLimitSuggestions.length > 0 && (
+                    <div className="position-absolute top-100 start-0 mt-1 w-100 bg-white border rounded shadow-sm z-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                      {newLimitSuggestions.map((sug, idx) => (
+                        <div key={idx} className="p-2 hover-bg-light cursor-pointer" style={{ cursor: 'pointer' }} onMouseDown={() => selectNewLimitSuggestion(sug)}>
+                          {sug.toLocaleString()}đ
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
             <div className="col-md-2"><button type="submit" className="btn btn-success w-100">Lưu</button></div>
@@ -323,7 +385,27 @@ const CategoryBudgetManager = ({ userId, onDataChange }) => {
               <div className="modal-body p-4">
                 <div className="mb-3"><label className="small text-muted fw-bold">Tên danh mục</label><input type="text" className="form-control" value={editName} onChange={e => setEditName(e.target.value)} /></div>
                 <div className="mb-3"><label className="small text-muted fw-bold">Loại</label><select className="form-select" value={editType} onChange={e => setEditType(e.target.value)}><option value="THU">Thu nhập</option><option value="CHI">Chi tiêu</option></select></div>
-                {editType === 'CHI' && (<div className="mb-3"><label className="small text-muted fw-bold">Hạn mức (VND)</label><input type="number" className="form-control" value={editLimit} onChange={e => setEditLimit(e.target.value)} /></div>)}
+                {editType === 'CHI' && (
+                  <div className="mb-3 position-relative">
+                    <label className="small text-muted fw-bold">Hạn mức (VND)</label>
+                    <input
+                      type="number"
+                      className="form-control no-arrows"
+                      value={editLimit}
+                      onChange={handleEditLimitChange}
+                      onBlur={() => setTimeout(() => setShowEditLimitSuggestions(false), 200)}
+                    />
+                    {showEditLimitSuggestions && editLimitSuggestions.length > 0 && (
+                      <div className="position-absolute top-100 start-0 mt-1 w-100 bg-white border rounded shadow-sm z-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                        {editLimitSuggestions.map((sug, idx) => (
+                          <div key={idx} className="p-2 hover-bg-light cursor-pointer" style={{ cursor: 'pointer' }} onMouseDown={() => selectEditLimitSuggestion(sug)}>
+                            {sug.toLocaleString()}đ
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
                 <button onClick={handleUpdateCategory} className="btn btn-primary w-100 py-2 fw-bold shadow-sm"> Lưu thay đổi</button>
               </div>
             </div>

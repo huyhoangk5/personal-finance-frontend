@@ -17,6 +17,8 @@ const TransactionFormModal = ({ userId, show, onClose, onTransactionAdded, editD
   const [newCatName, setNewCatName] = useState('');
   const [newCatType, setNewCatType] = useState('CHI');
   const [newCatLimit, setNewCatLimit] = useState('');
+  const [showAmountSuggestions, setShowAmountSuggestions] = useState(false);
+  const [amountSuggestions, setAmountSuggestions] = useState([]);
 
   const fetchCategories = async (type) => {
     try {
@@ -54,6 +56,32 @@ const TransactionFormModal = ({ userId, show, onClose, onTransactionAdded, editD
       });
     }
   }, [editData]);
+
+  const generateSuggestions = (value) => {
+    if (!value || isNaN(parseFloat(value))) return [];
+    const num = parseFloat(value);
+    if (num === 0) return [];
+    const firstDigit = parseInt(value.toString()[0]);
+    const suggestions = [];
+    const multipliers = [1000, 10000, 100000, 1000000];
+    for (let mult of multipliers) {
+      suggestions.push(firstDigit * mult);
+    }
+    return [...new Set(suggestions)].sort((a, b) => a - b);
+  };
+
+  const handleAmountChange = (e) => {
+    const val = e.target.value;
+    setFormData({ ...formData, amount: val });
+    const suggestions = generateSuggestions(val);
+    setAmountSuggestions(suggestions);
+    setShowAmountSuggestions(suggestions.length > 0);
+  };
+
+  const selectSuggestion = (suggestedValue) => {
+    setFormData({ ...formData, amount: suggestedValue.toString() });
+    setShowAmountSuggestions(false);
+  };
 
   const handleTypeChange = (newType) => {
     setFormData({ ...formData, type: newType, category: { categoryId: '' } });
@@ -153,7 +181,31 @@ const TransactionFormModal = ({ userId, show, onClose, onTransactionAdded, editD
               </div>
               <div className="mb-3">
                 <label className="small text-muted fw-bold">SỐ TIỀN (VND)</label>
-                <input type="number" className="form-control no-arrows" required placeholder="Ví dụ: 50000" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })} />
+                <div className="position-relative">
+                  <input
+                    type="number"
+                    className="form-control no-arrows"
+                    required
+                    placeholder="Ví dụ: 50000"
+                    value={formData.amount}
+                    onChange={handleAmountChange}
+                    onBlur={() => setTimeout(() => setShowAmountSuggestions(false), 200)}
+                  />
+                  {showAmountSuggestions && amountSuggestions.length > 0 && (
+                    <div className="position-absolute top-100 start-0 mt-1 w-100 bg-white border rounded shadow-sm z-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                      {amountSuggestions.map((sug, idx) => (
+                        <div
+                          key={idx}
+                          className="p-2 hover-bg-light cursor-pointer"
+                          style={{ cursor: 'pointer' }}
+                          onMouseDown={() => selectSuggestion(sug)}
+                        >
+                          {sug.toLocaleString()}đ
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="mb-3">
                 <label className="small text-muted fw-bold">NGÀY GIAO DỊCH</label>
