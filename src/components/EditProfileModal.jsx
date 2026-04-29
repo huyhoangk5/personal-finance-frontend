@@ -59,7 +59,7 @@ const EditProfileModal = ({ show, onClose, user, onUpdate }) => {
           <form onSubmit={handleSubmit} className="modal-body p-4">
             {error && <div className="alert alert-danger">{error}</div>}
             <div className="mb-3">
-              <label className="form-label small fw-bold">Tên đầy đủ</label>
+              <label className="form-label small fw-bold">Họ và tên</label>
               <input type="text" className="form-control" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Nhập họ tên" />
             </div>
             <div className="mb-3">
